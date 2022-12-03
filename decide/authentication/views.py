@@ -16,9 +16,9 @@ from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate, login, logout
 
 from .serializers import UserSerializer
-from .forms import PersonForm, LoginForm
+from .forms import PersonForm, LoginForm, CompleteForm
 from .models import Person
-
+from verify_email.email_handler import send_verification_email
 
 
 from django.contrib.auth import authenticate, login, logout
@@ -116,9 +116,10 @@ def register(request):
             age = form.cleaned_data.get('age')
             status = form.cleaned_data.get('status')
             country = form.cleaned_data.get('country')
-            user1=User(username=username,password=password1,email=email)
-            user1.save()
-            person1=Person(user=user1,sex=sex,age=age,status=status,country=country)
+
+            inactive_user = send_verification_email(request, form)
+            person1=Person(user=inactive_user,sex=sex,age=age,status=status,country=country)
+
             person1.save()
 
             return redirect('/')
@@ -137,3 +138,26 @@ def welcome(request):
 def salir(request):
     logout(request)
     return redirect('/')
+
+
+def complete(request):
+    if request.user.is_authenticated and not Person.objects.filter(user = request.user.id).exists():
+        user = request.user
+        form=CompleteForm
+        
+        if request.method=="POST":
+            form=CompleteForm(request.POST)
+
+            if form.is_valid():
+                sex = form.cleaned_data.get('sex')
+                age = form.cleaned_data.get('age')
+
+                person = Person(user = user, sex = sex, age = age)
+                person.save()
+
+                return redirect('/')
+
+        return render(request,'complete.html',{'form':form})
+    else:
+        return redirect('/')
+

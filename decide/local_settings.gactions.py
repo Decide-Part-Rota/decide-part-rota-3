@@ -1,9 +1,7 @@
-from decouple import config
-
-GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
-GOOGLE_SECRET = config('GOOGLE_SECRET')
-EMAIL_USER = config('EMAIL_USER')
-EMAIL_PASSWORD = config('EMAIL_PASSWORD')
+GOOGLE_CLIENT_ID = '${{ secrets.GOOGLE_CLIENT_ID }}'
+GOOGLE_SECRET = '${{ secrets.GOOGLE_SECRET }}'
+EMAIL_USER = '${{ secrets.EMAIL_USER }}'
+EMAIL_PASSWORD = '${{ secrets.EMAIL_PASSWORD }}'
 
 ALLOWED_HOSTS = ["*"]
 # Modules in use, commented modules that you won't use
